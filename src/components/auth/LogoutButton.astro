@@ -10,13 +10,13 @@
 </button>
 
 <script>
-    const { signOut } = await import("auth-astro/client");
+    import { signOut } from "auth-astro/client";
     const logoutButton = document.querySelector(
         "#logout-button",
     ) as HTMLButtonElement;
     if (logoutButton) {
         logoutButton.onclick = async () => {
-            signOut();
+            await signOut();
         };
     }
 </script>

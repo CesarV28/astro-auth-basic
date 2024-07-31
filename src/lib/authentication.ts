@@ -7,18 +7,18 @@
 // You can use this file to customize the authentication system for your app and change the 
 // auth provider.
 
-const authentication = await import("auth-astro/client")
+// const authentication = import("auth-astro/client")
 
 
 
-export const signIn = async ({ email, password }: { email: string; password: string }) => {
-    return authentication.signIn('credentials', {
-        email: email,
-        password: password,
-    })
-}
+// export const signIn = async ({ email, password }: { email: string; password: string }) => {
+//     return (await authentication).signIn('credentials', {
+//         email: email,
+//         password: password,
+//     })
+// }
 
-export const signOut = async () => {
-    return authentication.signOut({ redirect: true, callbackUrl: '/auth/login' })
-}
+// export const signOut = async () => {
+//     return (await authentication).signOut({ redirect: true, callbackUrl: '/auth/login' })
+// }
 

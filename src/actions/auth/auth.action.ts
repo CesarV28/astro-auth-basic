@@ -1,7 +1,7 @@
 
 
 import { createUser, getUserByEmail } from "@/db/user.db";
-import { checkEncryptedPasswordMatch, checkPasswordMatch } from "@/helpers/check-password-match";
+import { checkPasswordMatch } from "@/helpers/check-password-match";
 import { defineAction, z } from "astro:actions";
 
 

@@ -80,7 +80,7 @@ const rememberMe = !!email;
 <script>
     // --- Imports ---
     import { actions } from "astro:actions";
-    const { signIn } = await import("auth-astro/client");
+    import { signIn } from "auth-astro/client";
 
     // --- DOM Elements ---
     const signInButton = document.querySelector(
@@ -89,7 +89,7 @@ const rememberMe = !!email;
     const form = document.querySelector("#login-form") as HTMLFormElement;
 
     // --- Constants ---
-    const appUrl = new URL(window.location.href).origin
+    const appUrl = new URL(window.location.href).origin;
 
     // --- Functions ---
     const loading = (isLoading: boolean) => {
