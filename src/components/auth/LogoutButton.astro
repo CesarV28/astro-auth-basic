@@ -1,0 +1,22 @@
+---
+
+---
+
+<button
+    id="logout-button"
+    class="w-full flex justify-center items-center bg-cyan-400 hover:bg-cyan-500 text-gray-100 px-3 p-1 rounded-md font-semibold shadow-lg cursor-pointer transition ease-in duration-500"
+>
+    <slot />
+</button>
+
+<script>
+    const { signOut } = await import("auth-astro/client");
+    const logoutButton = document.querySelector(
+        "#logout-button",
+    ) as HTMLButtonElement;
+    if (logoutButton) {
+        logoutButton.onclick = async () => {
+            signOut();
+        };
+    }
+</script>

@@ -1,0 +1,132 @@
+---
+const email = Astro.cookies.get("email")?.value ?? "";
+const rememberMe = !!email;
+---
+
+<!-- component -->
+<div class="p-12 bg-white mx-auto rounded-2xl w-full md:w-[400px] shadow-md">
+    <div class="mb-4">
+        <h3 class="font-semibold text-2xl text-gray-800">Login</h3>
+        <p class="text-gray-500">Please sign in to your account.</p>
+    </div>
+    <form id="login-form" class="space-y-5">
+        <div class="space-y-2">
+            <label
+                for="email"
+                class="text-sm font-medium text-gray-700 tracking-wide"
+                >Email</label
+            >
+            <input
+                id="email"
+                name="email"
+                value={email}
+                class="w-full text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-400"
+                type="email"
+                placeholder="mail@gmail.com"
+            />
+        </div>
+        <div class="space-y-2">
+            <label
+                for="password"
+                class="mb-5 text-sm font-medium text-gray-700 tracking-wide"
+            >
+                Password
+            </label>
+            <input
+                id="password"
+                name="password"
+                class="w-full content-center text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-400"
+                type="password"
+                placeholder="Enter your password"
+            />
+        </div>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <input
+                    id="remember_me"
+                    name="remember_me"
+                    type="checkbox"
+                    checked={rememberMe}
+                    class="h-4 w-4 bg-blue-500 focus:ring-blue-400 border-gray-300 rounded"
+                />
+                <label
+                    for="remember_me"
+                    class="ml-2 block text-sm text-gray-800"
+                >
+                    Remember me
+                </label>
+            </div>
+            <div class="text-sm">
+                <a
+                    href="/auth/register"
+                    class="text-cyan-400 hover:text-cyan-500"
+                >
+                    Don't have an account?
+                </a>
+            </div>
+        </div>
+        <div>
+            <button
+                id="sign-in-button"
+                type="submit"
+                class="w-full flex justify-center disabled:opacity-70 bg-cyan-400 hover:bg-cyan-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500"
+            >
+                Sign in
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // --- Imports ---
+    import { actions } from "astro:actions";
+    const { signIn } = await import("auth-astro/client");
+
+    // --- DOM Elements ---
+    const signInButton = document.querySelector(
+        "#sign-in-button",
+    ) as HTMLButtonElement;
+    const form = document.querySelector("#login-form") as HTMLFormElement;
+
+    // --- Constants ---
+    const appUrl = new URL(window.location.href).origin
+
+    // --- Functions ---
+    const loading = (isLoading: boolean) => {
+        if (isLoading) {
+            signInButton.innerHTML = "Executing...";
+            signInButton.setAttribute("disabled", "disabled");
+            return;
+        }
+
+        signInButton.innerHTML = "Login";
+        signInButton.removeAttribute("disabled");
+    };
+
+    signInButton.onclick = async (e) => {
+        e.preventDefault();
+        loading(true);
+
+        const formData = new FormData(form);
+
+        try {
+            const result = await actions.loginUser.safe(formData);
+
+            if (result.error) {
+                console.log(result.error);
+                return;
+            }
+
+            await signIn("credentials", {
+                email: formData.get("email"),
+                password: formData.get("password"),
+            });
+
+            window.location.replace(`${appUrl}/protected`);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            loading(false);
+        }
+    };
+</script>

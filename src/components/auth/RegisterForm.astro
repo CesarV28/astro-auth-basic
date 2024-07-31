@@ -1,0 +1,157 @@
+---
+import Toast from "../icons/Toast.astro";
+
+const email = Astro.cookies.get("email")?.value ?? "";
+const rememberMe = !!email;
+---
+
+<!-- component -->
+<div class="p-12 bg-white mx-auto rounded-2xl w-full md:w-[400px] shadow-md">
+    <div class="mb-4">
+        <h3 class="font-semibold text-2xl text-gray-800">Register</h3>
+        <p class="text-gray-500">Create an account to access the site.</p>
+    </div>
+    <form id="register-form" class="space-y-5">
+        <div class="space-y-2">
+            <label
+                for="name"
+                class="text-sm font-medium text-gray-700 tracking-wide"
+                >name</label
+            >
+            <input
+                id="name"
+                name="name"
+                autocomplete="username"
+                class="w-full text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-400"
+                type="text"
+                placeholder="Enter your name"
+            />
+        </div>
+        <div class="space-y-2">
+            <label
+                for="email"
+                class="text-sm font-medium text-gray-700 tracking-wide"
+                >Email</label
+            >
+            <input
+                id="email"
+                name="email"
+                value={email}
+                class="w-full text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-400"
+                type="email"
+                placeholder="mail@gmail.com"
+            />
+        </div>
+        <div class="space-y-2">
+            <label
+                for="password"
+                class="mb-5 text-sm font-medium text-gray-700 tracking-wide"
+            >
+                Password
+            </label>
+            <input
+                id="password"
+                name="password"
+                required
+                autocomplete="current-password"
+                class="w-full content-center text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-400"
+                type="password"
+                placeholder="Enter your password"
+            />
+        </div>
+        <div class="space-y-2">
+            <label
+                for="password"
+                class="mb-5 text-sm font-medium text-gray-700 tracking-wide"
+            >
+                Confirm Password
+            </label>
+            <input
+                id="passwordConfirm"
+                name="passwordConfirm"
+                required
+                autocomplete="current-password"
+                class="w-full content-center text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-400"
+                type="password"
+                placeholder="Enter your password"
+            />
+        </div>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <input
+                    id="remember_me"
+                    name="remember_me"
+                    type="checkbox"
+                    checked={rememberMe}
+                    class="h-4 w-4 bg-blue-500 focus:ring-blue-400 border-gray-300 rounded"
+                />
+                <label
+                    for="remember_me"
+                    class="ml-2 block text-sm text-gray-800"
+                >
+                    Remember me
+                </label>
+            </div>
+            <div class="text-sm">
+                <a href="/auht/login" class="text-cyan-400 hover:text-cyan-500">
+                    Already have an account?
+                </a>
+            </div>
+        </div>
+        <div>
+            <button
+                id="register-button"
+                type="submit"
+                class="disabled:opacity-50 w-full flex justify-center bg-cyan-400 hover:bg-cyan-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500"
+            >
+                Register
+            </button>
+        </div>
+    </form>
+    <div id="toast-alert" class="hidden bottom-10 right-20 z-50">
+        <Toast type="danger" title="Error" message="Error registering user" />
+    </div>
+</div>
+
+<script>
+
+    // --- Imports ---
+    import { actions } from "astro:actions";
+
+    // --- DOM Elements ---
+    const form = document.querySelector("#register-form") as HTMLFormElement;
+    const buttonSubmit = document.querySelector(
+        "#register-button",
+    ) as HTMLButtonElement;
+    const toastAlert = document.querySelector("#toast-alert") as HTMLDivElement;
+
+    // --- Functions ---
+    form.addEventListener("submit", async (event) => {
+        try {
+            event.preventDefault();
+            buttonSubmit.innerHTML = "Registering...";
+            buttonSubmit.setAttribute("disabled", "disabled");
+
+            const formData = new FormData(form);
+
+            const { data, error } = await actions.registerUser.safe(formData);
+            if (error) {
+                console.error(error);
+
+                toastAlert.classList.remove("hidden");
+                toastAlert.classList.add("fixed");
+
+                // Remove the toast after 5 seconds
+                setTimeout(() => {
+                    toastAlert.classList.add("hidden");
+                }, 5000);
+                return;
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            buttonSubmit.innerHTML = "Register";
+            buttonSubmit.removeAttribute("disabled");
+        }
+    });
+</script>

@@ -1,0 +1,33 @@
+---
+import { PAGES } from "@/constants/site-config.ts";
+import LogoutButton from "../auth/LogoutButton.astro";
+
+const { isLoggedIn } = Astro.locals;
+---
+
+<!-- component -->
+<nav
+    class="flex justify-between px-20 py-6 items-center bg-white border-b border-gray-300"
+>
+    <h1 class="text-xl text-gray-800 font-bold">Astro Auth</h1>
+    <div class="flex items-center">
+        <ul class="flex items-center space-x-6">
+            {
+                PAGES.map((page) => (
+                    <a href={page.href} class="font-semibold text-gray-700">
+                        {page.name}
+                    </a>
+                ))
+            }
+            {
+                isLoggedIn ? (
+                    <LogoutButton>Logout</LogoutButton>
+                ) : (
+                    <a href="/auth/login" class="font-semibold text-gray-700">
+                        Login
+                    </a>
+                )
+            }
+        </ul>
+    </div>
+</nav>
