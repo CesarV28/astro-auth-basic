@@ -1,5 +1,5 @@
 ---
-import Toast from "../icons/Toast.astro";
+import Toast from "@/components/ui/Toast.astro";
 
 const email = Astro.cookies.get("email")?.value ?? "";
 const rememberMe = !!email;
@@ -134,7 +134,7 @@ const rememberMe = !!email;
 
             const formData = new FormData(form);
 
-            const { data, error } = await actions.registerUser.safe(formData);
+            const { error } = await actions.registerUser.safe(formData);
             if (error) {
                 console.error(error);
 

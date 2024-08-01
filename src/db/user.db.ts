@@ -1,10 +1,14 @@
 
-interface User {
+export interface AuthUser {
     id: string;
     name: string;
     email: string;
     password: string;
-    remember_me?: boolean;
+    image: string;
+    role: string;
+    isAuth0: boolean;
+    isTwoFactorEnabled: boolean;
+    emailVerified: boolean;
 }
 
 interface ReturnMessage<T> {
@@ -13,15 +17,24 @@ interface ReturnMessage<T> {
     data: T | null;
 }
 
-export const getUserByEmail = async (email: string): Promise<User | null> => {
+const mockUser: AuthUser = {
+    id: "1",
+    email: "cesarvargas@gmail.com",
+    name: "Cesar Vargas",
+    password: "123456",
+    image: "",
+    role: "admin",
+    isAuth0: false,
+    isTwoFactorEnabled: false,
+    emailVerified: true,
+}
+
+export const getUserByEmail = async (email: string): Promise<AuthUser | null> => {
     try {
-        const user = {
-            id: "1",
-            email,
-            name: "Cesar Vargas",
-            password: "123456",
-            remember_me: false,
-        }
+
+        // TODO: Get user from database
+        const user: AuthUser = mockUser
+
         await new Promise((resolve) => {
             setTimeout(() => {
                 resolve(true);
@@ -34,15 +47,11 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     }
 }
 
-export const getUserById = async (id: string): Promise<User | null> => {
+export const getUserById = async (id: string): Promise<AuthUser | null> => {
     try {
-        const user = {
-            id,
-            email: "cesarvargas@gmail.com",
-            name: "Cesar Vargas",
-            password: "123456",
-            remember_me: false,
-        }
+        // TODO: Get user from database
+        const user: AuthUser = mockUser
+
         return user;
     } catch (error) {
         console.error(error);
@@ -51,12 +60,29 @@ export const getUserById = async (id: string): Promise<User | null> => {
 }
 
 
+interface User {
+    id: string;
+    email: string;
+    name: string;
+    password: string;
+}
+
 export const createUser = async (user: User): Promise<ReturnMessage<User>> => {
     try {
+
+        const newUser: User = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            password: user.password,
+        }
+
+        // TODO: Save user to database
+
         return {
             status: "success",
             message: "User created successfully",
-            data: user,
+            data: null,
         };
     } catch (error) {
         console.error(error);

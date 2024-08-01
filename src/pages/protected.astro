@@ -12,6 +12,6 @@ if(!isLoggedIn || !user) {
 <MainLayout title="Protected Page" description="This is a protected page">
     <section class="container mx-auto">
         <h3 class="font-semibold text-2xl text-gray-800">Protected Page</h3>
-        <ProfileCard  email={user?.email ?? ""} name={user?.name ?? ""} />
+        <ProfileCard  user={user} />
     </section>
 </MainLayout>

@@ -79,7 +79,6 @@ const rememberMe = !!email;
 
 <script>
     // --- Imports ---
-    import { actions } from "astro:actions";
     import { signIn } from "auth-astro/client";
 
     // --- DOM Elements ---
@@ -110,16 +109,10 @@ const rememberMe = !!email;
         const formData = new FormData(form);
 
         try {
-            const result = await actions.loginUser.safe(formData);
-
-            if (result.error) {
-                console.log(result.error);
-                return;
-            }
-
             await signIn("credentials", {
                 email: formData.get("email"),
                 password: formData.get("password"),
+                redirect: false,
             });
 
             window.location.replace(`${appUrl}/protected`);

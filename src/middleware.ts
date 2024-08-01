@@ -16,8 +16,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
             id: user.id!,
             name: user.name!,
             email: user.email!,
-            img: '',
-            role: "user",
+            image: '',
+            role: user.role!,
+            isTwoFactorEnabled: user?.isTwoFactorEnabled as boolean,
         }
         context.locals.isLoggedIn = isLoggedIn;
     }

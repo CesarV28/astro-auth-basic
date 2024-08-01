@@ -6,8 +6,9 @@ interface User {
     id: string;
     name: string;
     email: string;
-    img: string;
+    image: string;
     role: string;
+    isTwoFactorEnabled: boolean;
 }
 
 declare namespace App {

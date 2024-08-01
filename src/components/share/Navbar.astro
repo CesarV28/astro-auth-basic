@@ -1,8 +1,13 @@
 ---
-import { PAGES } from "@/constants/site-config.ts";
+import {
+    PAGES,
+    ADMIN_PAGES,
+    PROTECTED_ROUTES,
+} from "@/constants/site-config.ts";
 import LogoutButton from "../auth/LogoutButton.astro";
 
-const { isLoggedIn } = Astro.locals;
+const { isLoggedIn, user } = Astro.locals;
+const userRole = user?.role || "user";
 ---
 
 <!-- component -->
@@ -18,6 +23,22 @@ const { isLoggedIn } = Astro.locals;
                         {page.name}
                     </a>
                 ))
+            }
+            {
+                userRole === "admin" &&
+                    ADMIN_PAGES.map((page) => (
+                        <a href={page.href} class="font-semibold text-gray-700">
+                            {page.name}
+                        </a>
+                    ))
+            }
+            {
+                isLoggedIn &&
+                    PROTECTED_ROUTES.map((page) => (
+                        <a href={page.href} class="font-semibold text-gray-700">
+                            {page.name}
+                        </a>
+                    ))
             }
             {
                 isLoggedIn ? (

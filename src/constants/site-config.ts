@@ -10,10 +10,16 @@ export const PAGES = [
         name: 'Home',
         href: '/',
     },
+]
+
+export const ADMIN_PAGES = [
     {
-        name: 'Login',
-        href: '/auth/login',
+        name: 'dashboard',
+        href: '/admin/dashboard',
     },
+]
+
+export const PROTECTED_ROUTES = [
     {
         name: 'Protected',
         href: '/protected',

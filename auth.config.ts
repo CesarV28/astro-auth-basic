@@ -26,7 +26,7 @@ export default defineConfig({
                 if (validatedFields.success) {
                     const { email, password } = validatedFields.data;
                     const user = await getUserByEmail(email);
-    
+
                     if (!user || !user.password) {
                         return null;
                     }
@@ -61,10 +61,10 @@ export default defineConfig({
 
             const existingUser = await getUserById(user.id || '');
 
-            // Prevent singin without emailVerification
-            // if(!existingUser || !existingUser.emailVerified) {
-            //     return false;
-            // }
+            //Prevent singin without emailVerification
+            if (!existingUser || !existingUser.emailVerified) {
+                return false;
+            }
 
             // if( existingUser.isTwoFactorEnabled ) {
             //     const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
@@ -81,17 +81,19 @@ export default defineConfig({
                 session.user.id = token.sub;
             }
 
-            if (token.roles && session.user) {
-                // session.user.roles = token.roles;
+            if (token.role && session.user) {
+                session.user.role = token.role as string;
             }
 
             if (session.user) {
                 session.user.name = token.name;
-                // session.user.email = token.email;
-                // session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
-                // session.user.isOAuth = token.isOAuth;
+                session.user.email = token.email as string;
+                session.user.image = token.image as string;
+                session.user.role = token.role as string;
+                session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+                session.user.isOAuth = token.isOAuth as boolean;
             }
-
+       
             return session
         },
         async jwt({ token }) {
@@ -106,8 +108,9 @@ export default defineConfig({
             token.isOAuth = !!existingAccount;
             token.name = existingUser.name;
             token.email = existingUser.email;
-            // token.roles = existingUser.roles;
-            // token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
+            token.role = existingUser.role;
+            token.image = existingUser.image;
+            token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
 
             return token;
         }

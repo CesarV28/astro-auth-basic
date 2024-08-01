@@ -1,15 +1,14 @@
 ---
+import type { AuthUser } from "@/db/user.db";
 interface Props {
-    name: string;
-    email: string;
-    imgSrc?: string;
+    user: Omit<AuthUser, "password" | "isAuth0" | "emailVerified">;
 }
 
-const { name, email, imgSrc } = Astro.props;
+const { name, email, image, isTwoFactorEnabled, role } = Astro.props.user;
 ---
 
 <div
-    class="relative flex flex-col items-center rounded-[20px] w-[400px] mx-auto p-4 bg-white bg-clip-border shadow-md"
+    class="relative flex flex-col items-center rounded-[20px] w-[500px] mx-auto p-4 bg-white bg-clip-border shadow-md"
 >
     <div class="relative flex h-32 w-full justify-center rounded-xl bg-cover">
         <div
@@ -20,7 +19,7 @@ const { name, email, imgSrc } = Astro.props;
             class="absolute -bottom-12 flex h-[87px] w-[87px] items-center justify-center rounded-full border-[4px] border-white bg-blue-700"
         >
             {
-                imgSrc ? (
+                image ? (
                     <img
                         class="h-full w-full rounded-full"
                         src="https://horizon-tailwind-react-git-tailwind-components-horizon-ui.vercel.app/static/media/avatar11.1060b63041fdffa5f8ef.png"
@@ -37,23 +36,28 @@ const { name, email, imgSrc } = Astro.props;
     <div class="mt-16 flex flex-col items-center">
         <h4 class="text-xl font-bold text-navy-700">
             {name}
+            <span>({role})</span>
         </h4>
         <p class="text-base font-normal text-gray-600">
             {email}
         </p>
     </div>
     <div class="mt-6 mb-3 flex gap-14 md:!gap-14">
-        <div class="flex flex-col items-center justify-center">
-            <p class="text-2xl font-bold text-navy-700">17</p>
-            <p class="text-sm font-normal text-gray-600">Posts</p>
-        </div>
-        <div class="flex flex-col items-center justify-center">
-            <p class="text-2xl font-bold text-navy-700">9.7K</p>
-            <p class="text-sm font-normal text-gray-600">Followers</p>
-        </div>
-        <div class="flex flex-col items-center justify-center">
-            <p class="text-2xl font-bold text-navy-700">434</p>
-            <p class="text-sm font-normal text-gray-600">Following</p>
+        <div class="flex flex-col gap-2 items-center justify-center">
+            <p class="font-bold text-navy-700">
+                Two Factor Authentication
+            </p>
+            {
+                isTwoFactorEnabled ? (
+                    <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">
+                        {isTwoFactorEnabled ? "Enabled" : "Disabled"}
+                    </span>
+                ) : (
+                    <span class="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">
+                        {isTwoFactorEnabled ? "Enabled" : "Disabled"}
+                    </span>
+                )
+            }
         </div>
     </div>
 </div>

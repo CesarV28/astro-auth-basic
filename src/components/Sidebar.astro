@@ -1,0 +1,402 @@
+---
+import DashboardIcon from "@/components/icons/DashboardIcon.astro";
+import UsersIcon from "@/components/icons/UsersIcon.astro";
+import SettingsIcon from "@/components/icons/SettingsIcon.astro";
+import HelpIcon from "@/components/icons/HelpIcon.astro";
+import CalendarIcon from "@/components/icons/CalendarIcon.astro";
+import UserIcon from "@/components/icons/UserIcon.astro";
+import LogoutIcon from "@/components/icons/LogoutIcon.astro";
+import PigIcon from "@/components/icons/PigIcon.astro";
+---
+
+<aside class="sidebar-container">
+    <div class="sidebar active">
+        <div class="sidebar-button">
+            <!-- Open svg icon -->
+             <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-4 w-4 open-sidebar-icon"
+            >
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </div>
+        <div class="head">
+            <div class="user-img">
+
+            </div>
+            <div class="user-details">
+                <p class="subtitle">johndoe@gmail.com</p>
+                <p class="title">John Doe</p>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="menu">
+                <p class="title">
+                    Menu
+                </p>
+                <ul>
+                    <li class="">
+                        <a href="#">
+                            <DashboardIcon class="icon" />
+                            <span class="text">Home</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="#">
+                            <UserIcon class="icon" />
+                            <span class="text">Audience</span>
+                            <!-- arrow down -->
+                             <svg
+                                class="sub-menu-arrow h-4 w-4"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </a>
+                        <ul class="sub-menu">
+                            <li>
+                                <a href="#">
+                                    <span class="text">Users</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="text">Suscribers</span>
+                                </a>
+                            </li>
+                        </ul>   
+                    </li>
+                    <li class="">
+                        <a href="#">
+                            <CalendarIcon class="icon" />
+                            <span class="text">Schedules</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="#">
+                            <PigIcon class="icon" />
+                            <span class="text">Incomes</span>
+                            <!-- arrow down -->
+                             <svg
+                                class="sub-menu-arrow h-4 w-4"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </a>
+                        <ul class="sub-menu">
+                            <li>
+                                <a href="#">
+                                    <span class="text">Earnings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="text">Funds</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="text">Declines</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="text">Payments</span>
+                                </a>
+                            </li>
+                        </ul>   
+                    </li>
+                </ul>
+            </div>
+            <div class="menu">
+                <p class="title">
+                    Settings
+                </p>
+                <ul>
+                    <li class="">
+                        <a href="#">
+                            <SettingsIcon class="icon" />
+                            <span class="text">Settings</span>
+                        </a>
+                    </li>
+                   
+                </ul>
+            </div>
+        </nav>
+        <div class="menu">
+            <p class="title">
+                Account
+            </p>
+            <ul>
+                <li class="">
+                    <a href="#">
+                        <HelpIcon class="icon" />
+                        <span class="text">Help</span>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#">
+                        <LogoutIcon class="icon" />
+                        <span class="text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</aside>
+
+
+<style>
+
+    .sidebar {
+        position: relative;
+        width: 256px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #fff;
+        padding: 24px;
+        border-right: 1px solid #eee;
+        border-radius: 15px;
+        transition: all 0.3s;
+    }
+
+    .sidebar .head {
+        display: flex;
+        gap: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .user-img {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f5f5f5;
+    }
+
+    .user-img img {
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .user-details .title,
+    .menu .title {
+        font-size: .7rem;
+        font-weight: 600;
+        color: #757575;
+        text-transform: uppercase;
+    }
+
+    .user-details .subtitle {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: #757575;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+    }
+    .menu ul {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .menu ul li{
+        position: relative;
+        list-style: none;
+        margin-bottom: 5px;
+    }
+
+    .menu ul li a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #757575;
+        text-decoration: none;
+        padding: 12px 8px;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .menu ul li > a:hover,
+    .menu ul li.active > a {
+        color: #000000;
+        background-color: #f6f6f6;
+    }
+
+    .menu ul li .icon {
+        font-size: 1.1rem;
+    }
+
+    .menu ul li .text {
+        flex: 1;
+    }
+
+    .menu ul li .sub-menu-arrow {
+        transition: all 0.3s;
+    }
+
+    .menu ul li.active .sub-menu-arrow {
+        transform: rotate(180deg);
+    }
+
+    .menu .sub-menu {
+        display: none;
+        margin-left: 20px;
+        padding-top: 5px;
+        padding-left: 20px;
+        border-left: 1px solid #f6f6f6;
+    }
+
+    .menu .sub-menu li a {
+        padding: 10px 8px;
+        font-size: .8rem;
+    }
+
+    .menu:not(:last-child) {
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #797979;
+    }
+
+    .sidebar-button {
+        position: absolute;
+        top: 30px;
+        right: -14px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #58bddb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .open-sidebar-icon {
+        transition: all 0.3s;
+    }
+
+    .sidebar.active {
+        width: 92px;
+    }
+
+    .sidebar.active .open-sidebar-icon {
+        transform: rotate(180deg);
+    }
+
+    .sidebar.active .user-details {
+        display: none;
+    }
+
+    .sidebar.active .menu .title {
+        text-align: center;
+    }
+
+    .sidebar.active .menu ul li .sub-menu-arrow {
+        display: none;
+    }
+
+    .sidebar.active .menu > ul > li > a {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar.active .menu > ul > li > a .text {
+        position: absolute;
+        left: 70px;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 10px;
+        border-radius: 4px;
+        color: #fff;
+        background-color: #58bddb;
+        opacity: 0;
+        visibility: hidden;
+    }
+    
+    .sidebar.active .menu > ul > li > a:hover .text {
+        left: 50px;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .sidebar.active .menu > ul > li > a .text::after {
+        content: '';
+        position: absolute;
+        left: -5px;
+        top: 50%;
+        transform: translateY(-88%);
+        padding: 10px;
+        width: 20%;
+        height: 20%;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #58bddb;
+        z-index: -1;
+    }
+
+    .sidebar.active .menu .sub-menu {
+        position: absolute;
+        top: 0;
+        left: 20px;
+        width: 200px;
+        border-radius: 20px;
+        padding: 10px 20px;
+        border: 1px solid #58bddb;
+        background-color: #fff;
+        box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu ul li:has(ul):hover > .sub-menu {
+        display: block;
+    }
+</style>
+
+
+<script>
+    const sidebar = document.querySelector(".sidebar");
+    const sidebarButton = document.querySelector(".sidebar-button");
+
+    if (sidebarButton && sidebar) {
+        sidebarButton.addEventListener("click", () => {
+            sidebar.classList.toggle("active");
+        });
+    }
+</script>
