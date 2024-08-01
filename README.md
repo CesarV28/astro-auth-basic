@@ -1,47 +1,70 @@
-# Astro Starter Kit: Minimal
+# Astro Auth Using AuthJs
 
-```sh
-npm create astro@latest -- --template minimal
+## Project Description
+Astro Auth Using AuthJs is a template for implementing user authentication in an Astro project. It is designed to be flexible and can be integrated with various authentication providers and databases. Additionally, it utilizes server actions in experimental mode.
+
+## Prerequisites
+- Node.js v18.x or later
+- pnpm v8.x or later or Node.js v18.x or later
+
+## Installation
+```bash
+pnpm install
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+## Configuration
+1. Create a `.env ` file at the root of the project with the following variables:
+```bash
+cp .example.env .env
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+2. Edit the `.env` file with the following variables (replace `APP_URL` with your website's URL):
+    ```bash
+    APP_URL=http://localhost:3000
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+    AUTH_TRUST_HOST=true
+    AUTH_SECRET=secret
+    ```
 
-Any static assets, like images, can be placed in the `public/` directory.
+You can use the following command to create the `AUTH_SECRET`:
+```bash
+openssl rand -base64 32
+```
 
-## 🧞 Commands
+## Running the Project
+```bash
+pnpm dev
+```
+### Usage
+After starting the development server, visit `http://localhost:4321` in your web browser to see the authentication system in action.
 
-All commands are run from the root of the project, from a terminal:
+## Database Integration (Optional)
+To use a database adapter, configure the `auth.config.ts` file and follow one of these approaches:
+ 1. Install an ORM (e.g., Prisma or Drizzle)
+    - Install Prisma or Drizzle:
+        ```bash
+        # Drizzle
+        pmpm add drizzle-orm @auth/drizzle-adapter
+        # Prisma
+        pnpm add @prisma/client @auth/prisma-adapter
+        ```
+    - Configure the ORM and database [Drizzle](https://authjs.dev/getting-started/adapters/drizzle) or [Prisma](https://authjs.dev/getting-started/adapters/prisma)
+    - Update the functions in the `src/db` folder to integrate with your database and return the necessary values.
+  2. Use Existing Database Functions
+    - The `src/db` folder contains predefined functions that need integration with your database.
+    - Modify these functions to work with your database and ensure they return the required values.
+  3. Schema: Create a database schema using the `src/db/database_schema.sql` file.
+Important: tables must follow the same structure as the mockUser object in the `db/user.db.ts` file.
+## Additional Modifications
+### Extending Interfaces
+ - auth.d.ts: Defines the `User` and `Session` interfaces used to extend the AuthJs interfaces. It is used in the `auth.config.ts` file to define authentication, session, and JWT functions.
+ - env.d.ts: Defines the `User` and `Locals` interfaces used to extend the Astro interfaces. The `Locals` interfaces are used to define local variables utilized in the `middleware.ts` file and called in the Astro pages.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+### auth.config.ts
+ - Providers: Defines the authentication providers used on the website. This example uses Credentials, but other providers such as GitHub, Google, Facebook, etc., can be added.
+ - Pages: Defines the routes for the authentication and registration pages.
+ - Events: Defines functions executed during different AuthJs events.
+ - Callbacks: Defines functions executed during different AuthJs events.
+   - Session: Defines the session options used on the website and extends the AuthJs session information.
+   - JWT: Defines the JWT options used on the website and extends the AuthJs token information.
+ - Adapter: Currently, no database adapter is being used, so this section is left empty.
