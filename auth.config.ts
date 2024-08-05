@@ -1,3 +1,4 @@
+import { deleteTwoFactorConfirmationById, getTwoFactorConfirmationByUserId } from '@/db/two-factor-confirmation.db';
 import { getUserByEmail, getUserById } from '@/db/user.db';
 import { LoginSchema } from '@/schemas/auth.schema';
 import Credentials from '@auth/core/providers/credentials';
@@ -66,12 +67,12 @@ export default defineConfig({
                 return false;
             }
 
-            // if( existingUser.isTwoFactorEnabled ) {
-            //     const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
-            //     if(!twoFactorConfirmation) return false;
+            if( existingUser.isTwoFactorEnabled ) {
+                const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
+                if(!twoFactorConfirmation) return false;
 
-            //     await deleteTwoFactorConfirmationById(twoFactorConfirmation.id);
-            // }
+                await deleteTwoFactorConfirmationById(twoFactorConfirmation.id);
+            }
 
             return true;
         },

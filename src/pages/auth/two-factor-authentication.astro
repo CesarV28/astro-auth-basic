@@ -1,0 +1,19 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import PinOtpForm from '@/components/ui/PinOtpForm.astro';
+---
+
+
+<AuthLayout title="Two Factor Authentication">
+    <div class="container mt-12 mx-auto">
+        <div class="mx-auto flex flex-col items-center justify-center space-y-4">
+            <h1 class="text-3xl font-bold">Two Factor Authentication</h1>
+            <p class="text-lg opacity-90">
+                Please enter the code sent to your phone.
+            </p>
+            <div class="mx-auto">
+                <PinOtpForm />
+            </div>
+        </div>
+    </div>
+</AuthLayout>

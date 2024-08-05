@@ -1,5 +1,6 @@
 ---
 import LoginForm from "@/components/auth/LoginForm.astro";
+import PinOtpForm from "@/components/ui/PinOtpForm.astro";
 import AuthLayout from "@/layouts/AuthLayout.astro";
 ---
 
@@ -9,7 +10,262 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
     >
         <LoginForm />
     </section>
+    <div class="otp-container container mt-12 mx-auto">
+        <div
+            class="mx-auto flex flex-col items-center justify-center space-y-4"
+        >
+            <h1 class="text-3xl font-bold">Two Factor Authentication</h1>
+            <p class="text-lg opacity-90">
+                Please enter the code sent to your phone.
+            </p>
+            <div class="mx-auto">
+                <PinOtpForm />
+            </div>
+        </div>
+    </div>
 </AuthLayout>
+
+<!-- ------------------------------ LOGIN FORM -------------------------------- -->
+<script>
+    // --- Imports ---
+    import { actions } from "astro:actions";
+    import { signIn } from "auth-astro/client";
+
+    // --- DOM Elements ---
+    const signInButton = document.querySelector(
+        "#sign-in-button",
+    ) as HTMLButtonElement;
+    const form = document.querySelector("#login-form") as HTMLFormElement;
+    const authContainer = document.querySelector(
+        ".auth-container",
+    ) as HTMLElement;
+    const otpContainer = document.querySelector(
+        ".otp-container",
+    ) as HTMLElement;
+
+    // --- Variables ---
+    let email = "";
+    let password = "";
+
+    // --- Functions ---
+    const loading = (payload: {
+        textButton: { text: string; loading: string };
+        isLoading: boolean;
+        button: HTMLButtonElement;
+    }) => {
+        const {
+            textButton: { text, loading },
+            isLoading,
+            button,
+        } = payload;
+        if (isLoading) {
+            button.innerHTML = loading;
+            button.setAttribute("disabled", "disabled");
+            return;
+        }
+
+        button.innerHTML = text;
+        button.removeAttribute("disabled");
+    };
+
+    function switchToOTP() {
+        authContainer.style.opacity = "1";
+        authContainer.style.transition = "opacity 0.1s ease";
+
+        authContainer.style.opacity = "0";
+
+        setTimeout(() => {
+            authContainer.style.display = "none";
+            otpContainer.style.display = "block";
+            otpContainer.style.opacity = "0";
+
+            setTimeout(() => {
+                otpContainer.style.transition = "opacity 0.1s ease";
+                otpContainer.style.opacity = "1";
+            }, 20);
+        }, 400);
+    }
+
+    signInButton.onclick = async (e) => {
+        e.preventDefault();
+        loading({
+            button: signInButton,
+            isLoading: true,
+            textButton: {
+                text: "Executing...",
+                loading: "Executing...",
+            },
+        });
+        const formData = new FormData(form);
+        try {
+            const { data, error } = await actions.loginUser.safe(formData);
+
+            if (error) {
+                alert(error.message);
+                return;
+            }
+
+            email = (formData.get("email") as string) || "";
+            password = (formData.get("password") as string) || "";
+
+            if (data?.status === "verification") {
+                switchToOTP();
+                return;
+            }
+
+            if (data?.status === "success") {
+                await signIn("credentials", {
+                    email: email,
+                    password: password,
+                    redirect: false,
+                });
+                return;
+            }
+
+            // window.location.replace(`${appUrl}/protected`);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            loading({
+                button: signInButton,
+                isLoading: false,
+                textButton: {
+                    text: "Login",
+                    loading: "Login",
+                },
+            });
+        }
+    };
+
+    // -------------------------- otp form ----------------------------
+    // --- Declare variables from DOM elements ---
+    const inputs = document.querySelectorAll(
+        ".opt-bx input",
+    ) as NodeListOf<HTMLInputElement>;
+
+    const otpForm = document.querySelector(".otp-form") as HTMLFormElement;
+
+    const submitBtn = document.querySelector(
+        ".submit-btn",
+    ) as HTMLButtonElement;
+    const resendBtn = document.querySelector(
+        ".resend-btn button",
+    ) as HTMLButtonElement;
+
+    // --- Functions ---
+    const handleOtpPaste = (e: ClipboardEvent) => {
+        const pastedText = e.clipboardData?.getData("text");
+        if (pastedText) {
+            const value = pastedText.split("");
+            if (value.length === inputs.length) {
+                inputs.forEach((input, index) => {
+                    input.value = value[index];
+                    submitBtn.removeAttribute("disabled");
+                });
+            }
+        }
+    };
+
+    // --- Event listeners ---
+    inputs.forEach((input) => {
+        input.addEventListener("paste", handleOtpPaste);
+
+        let lasInputStatus = 0;
+        input.onkeyup = (e) => {
+            const currentElement = e.target as HTMLInputElement;
+            const nextElement = input.nextElementSibling as HTMLInputElement;
+            const previousElement =
+                input.previousElementSibling as HTMLInputElement;
+
+            if (previousElement && e.key === "Backspace") {
+                if (lasInputStatus === 1) {
+                    previousElement.value = "";
+                    previousElement.focus();
+                }
+                submitBtn.setAttribute("disabled", "disabled");
+                lasInputStatus = 1;
+            } else {
+                const regex = /^[0-9]$/;
+                const test = !regex.test(currentElement.value);
+                if (test) {
+                    currentElement.value = currentElement.value.replace(
+                        /\D/g,
+                        "",
+                    );
+                } else if (currentElement.value) {
+                    if (nextElement) {
+                        nextElement.focus();
+                    } else {
+                        submitBtn.removeAttribute("disabled");
+                        lasInputStatus = 0;
+                    }
+                }
+            }
+        };
+    });
+
+    // Submit form
+    if (otpForm) {
+        otpForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            loading({
+                button: submitBtn,
+                isLoading: true,
+                textButton: {
+                    text: "Executing...",
+                    loading: "Executing...",
+                },
+            });
+
+            let otpValues: string = "";
+
+            inputs.forEach((input) => (otpValues += input.value));
+            if (otpValues.length != 6) {
+                alert("Please enter the correct code");
+                return;
+            }
+
+            try {
+                const { status } = await actions.verifyTwoFactorAuthentication({
+                    code: otpValues,
+                    email: email,
+                });
+
+                if (status === "success") {
+                    console.log({
+                        email,
+                        password,
+                        otpValues,
+                    });
+                    await signIn("credentials", {
+                        email: email,
+                        password: password,
+                        redirect: false,
+                    });
+                    return;
+                }
+
+                alert("Invalid code");
+            } catch (error) {
+                console.error(error);
+            } finally {
+                loading({
+                    button: submitBtn,
+                    isLoading: false,
+                    textButton: {
+                        text: "Submit",
+                        loading: "Submit",
+                    },
+                });
+            }
+        });
+    }
+
+    resendBtn.addEventListener("click", () => {
+        alert("TODO: Send a new code to the user's phone");
+    });
+</script>
 
 <style>
     .auth-container {
@@ -20,5 +276,14 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
             rgba(9, 9, 121, 0) 44%,
             rgba(0, 212, 255, 0.2) 100%
         );
+    }
+
+    .otp-container {
+        display: none;
+    }
+
+    #authContainer,
+    #otpContainer {
+        transition: opacity 0.1s ease;
     }
 </style>

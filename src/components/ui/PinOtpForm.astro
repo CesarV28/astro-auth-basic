@@ -1,0 +1,178 @@
+---
+
+---
+
+<div>
+    <form class="otp-form">
+        <div class="opt-bx">
+            <input type="text" maxlength="1" />
+            <input type="text" maxlength="1" />
+            <input type="text" maxlength="1" class="space" />
+            <input type="text" maxlength="1" />
+            <input type="text" maxlength="1" />
+            <input type="text" maxlength="1" />
+        </div>
+        <button disabled class="submit-btn" type="submit">Submit</button>
+    </form>
+    <p class="resend-btn">
+        Did not receive a code? <button>Resend Code</button>
+    </p>
+</div>
+
+<!-- <script>
+    import { actions } from "astro:actions";
+
+    // --- Declare variables from DOM elements ---
+    const inputs = document.querySelectorAll(
+        ".opt-bx input",
+    ) as NodeListOf<HTMLInputElement>;
+
+    const form = document.querySelector(".otp-form") as HTMLFormElement;
+    const submitBtn = document.querySelector(
+        ".submit-btn",
+    ) as HTMLButtonElement;
+    const resendBtn = document.querySelector(
+        ".resend-btn button",
+    ) as HTMLButtonElement;
+
+    // --- Functions ---
+    const handleOtpPaste = (e: ClipboardEvent) => {
+        const pastedText = e.clipboardData?.getData("text");
+        if (pastedText) {
+            const value = pastedText.split("");
+            if (value.length === inputs.length) {
+                inputs.forEach((input, index) => {
+                    input.value = value[index];
+                    submitBtn.removeAttribute("disabled");
+                });
+            }
+        }
+    };
+
+    const getQueryParam = (param: string) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    };
+
+    // --- Event listeners ---
+    inputs.forEach((input, index) => {
+        input.addEventListener("paste", handleOtpPaste);
+
+        let lasInputStatus = 0;
+        input.onkeyup = (e) => {
+            const currentElement = e.target as HTMLInputElement;
+            const nextElement = input.nextElementSibling as HTMLInputElement;
+            const previousElement =
+                input.previousElementSibling as HTMLInputElement;
+
+            if (previousElement && e.key === "Backspace") {
+                if (lasInputStatus === 1) {
+                    previousElement.value = "";
+                    previousElement.focus();
+                }
+                submitBtn.setAttribute("disabled", "disabled");
+                lasInputStatus = 1;
+            } else {
+                const regex = /^[0-9]$/;
+                const test = !regex.test(currentElement.value);
+                if (test) {
+                    currentElement.value = currentElement.value.replace(
+                        /\D/g,
+                        "",
+                    );
+                } else if (currentElement.value) {
+                    if (nextElement) {
+                        nextElement.focus();
+                    } else {
+                        submitBtn.removeAttribute("disabled");
+                        lasInputStatus = 0;
+                    }
+                }
+            }
+        };
+    });
+
+    // Submit form
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            let otpValues: string = "";
+            const email = (getQueryParam("email") as string) || "";
+
+            inputs.forEach((input) => (otpValues += input.value));
+            if (otpValues.length != 6) {
+                alert("Please enter the correct code");
+                return;
+            }
+
+            const {} = await actions.verifyTwoFactorAuthentication({
+                code: otpValues,
+                email,
+            });
+
+            alert(`Your code is ${otpValues}`);
+        });
+    }
+
+    resendBtn.addEventListener("click", () => {
+        alert("TODO: Send a new code to the user's phone");
+    });
+</script> -->
+
+<style>
+    :root {
+        --color-primary: #1f2937;
+    }
+
+    .otp-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .opt-bx {
+        display: flex;
+        gap: 10px;
+    }
+
+    .opt-bx input {
+        width: 50px;
+        font-size: 2rem;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        margin: 2px;
+        border: solid 1px #55525c;
+        background-color: var(--color-primary);
+        font-weight: bold;
+        color: #fff;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    .submit-btn {
+        background-color: var(--color-primary);
+        color: #fff;
+        border: none;
+        padding: 5px 20px;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .resend-btn {
+        margin-top: 16px;
+        text-align: center;
+        color: var(--color-primary);
+    }
+
+    .resend-btn button {
+        color: #3ba4f9;
+    }
+</style>

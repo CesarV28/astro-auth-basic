@@ -25,7 +25,7 @@ const mockUser: AuthUser = {
     image: "",
     role: "admin",
     isAuth0: false,
-    isTwoFactorEnabled: false,
+    isTwoFactorEnabled: true,
     emailVerified: true,
 }
 
