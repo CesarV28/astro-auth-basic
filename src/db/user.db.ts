@@ -60,21 +60,26 @@ export const getUserById = async (id: string): Promise<AuthUser | null> => {
 }
 
 
-interface User {
+interface NewUser {
     id: string;
     email: string;
     name: string;
     password: string;
 }
 
-export const createUser = async (user: User): Promise<ReturnMessage<User>> => {
+export const createUser = async (user: NewUser): Promise<ReturnMessage<AuthUser>> => {
     try {
 
-        const newUser: User = {
+        const newUser: AuthUser = {
             id: user.id,
             email: user.email,
             name: user.name,
             password: user.password,
+            isTwoFactorEnabled: false,
+            isAuth0: false,
+            image: "",
+            role: "",
+            emailVerified: false
         }
 
         // TODO: Save user to database
@@ -82,7 +87,7 @@ export const createUser = async (user: User): Promise<ReturnMessage<User>> => {
         return {
             status: "success",
             message: "User created successfully",
-            data: null,
+            data: newUser,
         };
     } catch (error) {
         console.error(error);

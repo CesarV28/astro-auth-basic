@@ -25,7 +25,6 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
     </div>
 </AuthLayout>
 
-<!-- ------------------------------ LOGIN FORM -------------------------------- -->
 <script>
     // --- Imports ---
     import { actions } from "astro:actions";
@@ -42,61 +41,48 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
     const otpContainer = document.querySelector(
         ".otp-container",
     ) as HTMLElement;
+    const otpForm = document.querySelector(".otp-form") as HTMLFormElement;
+    const submitBtn = document.querySelector(
+        ".submit-btn",
+    ) as HTMLButtonElement;
+    const resendBtn = document.querySelector(
+        ".resend-btn button",
+    ) as HTMLButtonElement;
+    const inputs = document.querySelectorAll(
+        ".opt-bx input",
+    ) as NodeListOf<HTMLInputElement>;
 
     // --- Variables ---
     let email = "";
     let password = "";
 
     // --- Functions ---
-    const loading = (payload: {
-        textButton: { text: string; loading: string };
-        isLoading: boolean;
-        button: HTMLButtonElement;
-    }) => {
-        const {
-            textButton: { text, loading },
-            isLoading,
-            button,
-        } = payload;
-        if (isLoading) {
-            button.innerHTML = loading;
-            button.setAttribute("disabled", "disabled");
-            return;
-        }
-
-        button.innerHTML = text;
-        button.removeAttribute("disabled");
+    const setLoadingState = (
+        button: HTMLButtonElement,
+        isLoading: boolean,
+        text: string,
+    ) => {
+        button.innerHTML = isLoading ? `${text}...` : text;
+        button.disabled = isLoading;
     };
 
-    function switchToOTP() {
-        authContainer.style.opacity = "1";
-        authContainer.style.transition = "opacity 0.1s ease";
-
+    const switchToOTP = () => {
         authContainer.style.opacity = "0";
-
         setTimeout(() => {
             authContainer.style.display = "none";
             otpContainer.style.display = "block";
-            otpContainer.style.opacity = "0";
-
-            setTimeout(() => {
-                otpContainer.style.transition = "opacity 0.1s ease";
-                otpContainer.style.opacity = "1";
-            }, 20);
+            otpContainer.style.opacity = "1";
         }, 400);
-    }
+    };
 
-    signInButton.onclick = async (e) => {
+    const handleSignIn = async (e: Event) => {
         e.preventDefault();
-        loading({
-            button: signInButton,
-            isLoading: true,
-            textButton: {
-                text: "Executing...",
-                loading: "Executing...",
-            },
-        });
+        setLoadingState(signInButton, true, "Login");
+
         const formData = new FormData(form);
+        email = (formData.get("email") as string) || "";
+        password = (formData.get("password") as string) || "";
+
         try {
             const { data, error } = await actions.loginUser.safe(formData);
 
@@ -105,166 +91,98 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
                 return;
             }
 
-            email = (formData.get("email") as string) || "";
-            password = (formData.get("password") as string) || "";
-
             if (data?.status === "verification") {
                 switchToOTP();
-                return;
-            }
-
-            if (data?.status === "success") {
+            } else if (data?.status === "success") {
                 await signIn("credentials", {
-                    email: email,
-                    password: password,
+                    email,
+                    password,
                     redirect: false,
                 });
-                return;
             }
-
-            // window.location.replace(`${appUrl}/protected`);
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
         } finally {
-            loading({
-                button: signInButton,
-                isLoading: false,
-                textButton: {
-                    text: "Login",
-                    loading: "Login",
-                },
-            });
+            setLoadingState(signInButton, false, "Login");
         }
     };
 
-    // -------------------------- otp form ----------------------------
-    // --- Declare variables from DOM elements ---
-    const inputs = document.querySelectorAll(
-        ".opt-bx input",
-    ) as NodeListOf<HTMLInputElement>;
-
-    const otpForm = document.querySelector(".otp-form") as HTMLFormElement;
-
-    const submitBtn = document.querySelector(
-        ".submit-btn",
-    ) as HTMLButtonElement;
-    const resendBtn = document.querySelector(
-        ".resend-btn button",
-    ) as HTMLButtonElement;
-
-    // --- Functions ---
     const handleOtpPaste = (e: ClipboardEvent) => {
         const pastedText = e.clipboardData?.getData("text");
-        if (pastedText) {
-            const value = pastedText.split("");
-            if (value.length === inputs.length) {
-                inputs.forEach((input, index) => {
-                    input.value = value[index];
-                    submitBtn.removeAttribute("disabled");
-                });
+        if (pastedText && pastedText.length === inputs.length) {
+            inputs.forEach((input, index) => {
+                input.value = pastedText[index];
+            });
+            submitBtn.removeAttribute("disabled");
+        }
+    };
+
+    const handleOtpKeyUp = (e: KeyboardEvent) => {
+        const currentElement = e.target as HTMLInputElement;
+        const nextElement =
+            currentElement.nextElementSibling as HTMLInputElement;
+        const previousElement =
+            currentElement.previousElementSibling as HTMLInputElement;
+
+        if (e.key === "Backspace" && previousElement) {
+            previousElement.focus();
+            previousElement.value = "";
+            submitBtn.setAttribute("disabled", "disabled");
+        } else if (currentElement.value) {
+            if (nextElement) {
+                nextElement.focus();
+            } else {
+                submitBtn.removeAttribute("disabled");
             }
         }
     };
 
-    // --- Event listeners ---
+    const handleOtpSubmit = async (e: Event) => {
+        e.preventDefault();
+        setLoadingState(submitBtn, true, "Submit");
+
+        const otpValues = Array.from(inputs)
+            .map((input) => input.value)
+            .join("");
+        if (otpValues.length !== 6) {
+            alert("Please enter the correct code");
+            setLoadingState(submitBtn, false, "Submit");
+            return;
+        }
+
+        try {
+            const { status } = await actions.verifyTwoFactorAuthentication({
+                code: otpValues,
+                email,
+            });
+            if (status === "success") {
+                await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+            } else {
+                alert("Invalid code");
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoadingState(submitBtn, false, "Submit");
+        }
+    };
+
+    const handleResendClick = () => {
+        alert("TODO: Send a new code to the user's phone");
+    };
+
+    // --- Event Listeners ---
+    signInButton.onclick = handleSignIn;
     inputs.forEach((input) => {
         input.addEventListener("paste", handleOtpPaste);
-
-        let lasInputStatus = 0;
-        input.onkeyup = (e) => {
-            const currentElement = e.target as HTMLInputElement;
-            const nextElement = input.nextElementSibling as HTMLInputElement;
-            const previousElement =
-                input.previousElementSibling as HTMLInputElement;
-
-            if (previousElement && e.key === "Backspace") {
-                if (lasInputStatus === 1) {
-                    previousElement.value = "";
-                    previousElement.focus();
-                }
-                submitBtn.setAttribute("disabled", "disabled");
-                lasInputStatus = 1;
-            } else {
-                const regex = /^[0-9]$/;
-                const test = !regex.test(currentElement.value);
-                if (test) {
-                    currentElement.value = currentElement.value.replace(
-                        /\D/g,
-                        "",
-                    );
-                } else if (currentElement.value) {
-                    if (nextElement) {
-                        nextElement.focus();
-                    } else {
-                        submitBtn.removeAttribute("disabled");
-                        lasInputStatus = 0;
-                    }
-                }
-            }
-        };
+        input.addEventListener("keyup", handleOtpKeyUp);
     });
-
-    // Submit form
-    if (otpForm) {
-        otpForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            loading({
-                button: submitBtn,
-                isLoading: true,
-                textButton: {
-                    text: "Executing...",
-                    loading: "Executing...",
-                },
-            });
-
-            let otpValues: string = "";
-
-            inputs.forEach((input) => (otpValues += input.value));
-            if (otpValues.length != 6) {
-                alert("Please enter the correct code");
-                return;
-            }
-
-            try {
-                const { status } = await actions.verifyTwoFactorAuthentication({
-                    code: otpValues,
-                    email: email,
-                });
-
-                if (status === "success") {
-                    console.log({
-                        email,
-                        password,
-                        otpValues,
-                    });
-                    await signIn("credentials", {
-                        email: email,
-                        password: password,
-                        redirect: false,
-                    });
-                    return;
-                }
-
-                alert("Invalid code");
-            } catch (error) {
-                console.error(error);
-            } finally {
-                loading({
-                    button: submitBtn,
-                    isLoading: false,
-                    textButton: {
-                        text: "Submit",
-                        loading: "Submit",
-                    },
-                });
-            }
-        });
-    }
-
-    resendBtn.addEventListener("click", () => {
-        alert("TODO: Send a new code to the user's phone");
-    });
+    if (otpForm) otpForm.addEventListener("submit", handleOtpSubmit);
+    if (resendBtn) resendBtn.addEventListener("click", handleResendClick);
 </script>
 
 <style>

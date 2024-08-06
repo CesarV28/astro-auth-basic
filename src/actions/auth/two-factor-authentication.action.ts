@@ -1,3 +1,5 @@
+import { createTwoFactorConfirmation, deleteTwoFactorConfirmationById, getTwoFactorConfirmationByUserId } from "@/db/two-factor-confirmation.db";
+import { deleteTwoFactorTokenTokenById, getTwoFactorTokenByEmail } from "@/db/two-factor-token";
 import { getUserByEmail } from "@/db/user.db";
 import { defineAction, z } from "astro:actions";
 
@@ -23,8 +25,33 @@ export const verifyTwoFactorAuthentication = defineAction({
             throw new Error("Two-factor authentication is not enabled for this account.");
         }
 
+        const twoFactorToken = await getTwoFactorTokenByEmail({ email: user.email });
 
-        // TODO: Send verification code
+        if (!twoFactorToken) {
+            throw new Error("Two-factor authentication is not enabled for this account.");
+        }
+
+        if (twoFactorToken.token !== code) {
+            throw new Error("Invalid verification code.");
+        }
+
+        const hasExpired = new Date(twoFactorToken.expires) < new Date();
+
+        if (hasExpired) {
+            throw new Error("Verification code has expired.");
+        }
+
+        await deleteTwoFactorTokenTokenById({ id: twoFactorToken.id });
+
+        const existingTwoFactorConfirmation = await getTwoFactorConfirmationByUserId(user.id);
+
+        if (existingTwoFactorConfirmation) {
+            await deleteTwoFactorConfirmationById(existingTwoFactorConfirmation.id);
+        }
+
+        await createTwoFactorConfirmation({
+            userId: user.id,
+        });
 
         return {
             status: 'success',

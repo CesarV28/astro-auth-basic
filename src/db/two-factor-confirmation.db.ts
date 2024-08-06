@@ -2,9 +2,7 @@
 
 interface TwoFactorConfirmation {
     id: string   
-    email: string
-    token: string
-    expires: Date
+    userId: string
 }
 
 
@@ -12,9 +10,7 @@ export const getTwoFactorConfirmationByUserId = async (userId: string) => {
     try {
         const twoFactorConfirmation: TwoFactorConfirmation = {
             id: "",
-            email: "",
-            token: "",
-            expires: new Date()
+            userId: "",
         }
 
         return twoFactorConfirmation;
@@ -26,6 +22,8 @@ export const getTwoFactorConfirmationByUserId = async (userId: string) => {
 export const createTwoFactorConfirmation = async (values: Omit<TwoFactorConfirmation, 'id'>) => {
     try {
         // TODO: Create a new record in the database
+
+        return values;
     } catch (error) {
         console.log(error)
     }
@@ -33,18 +31,12 @@ export const createTwoFactorConfirmation = async (values: Omit<TwoFactorConfirma
 
 export const deleteTwoFactorConfirmationById = async (id: string) => {
     try {
-        const twoFactorConfirmation = {
-            id: "",
-            email: "",
-            token: "",
-            expires: new Date()
-        }
-
+        const twoFactorConfirmation =  id
         if (!twoFactorConfirmation) return null;
 
         // TODO: Delete the record from the database
 
-        return twoFactorConfirmation;
+        return id;
     } catch (error) {
         return null;
     }

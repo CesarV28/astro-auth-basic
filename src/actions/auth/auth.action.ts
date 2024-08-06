@@ -1,8 +1,10 @@
 
-
+import { defineAction, z } from "astro:actions";
 import { createUser, getUserByEmail } from "@/db/user.db";
 import { checkPasswordMatch } from "@/helpers/check-password-match";
-import { defineAction, z } from "astro:actions";
+import { generateTwoFactorToken, generateVerificationToken } from "@/lib/tokens";
+import { sendTwoFactorTokenEmail, sendVerificationTokenEmail } from "@/lib/mail";
+
 
 
 export const registerUser = defineAction({
@@ -54,12 +56,22 @@ export const registerUser = defineAction({
             name,
         });
 
-        if (response.status === 'error') {
+        if (response.status === 'error' || !response.data) {
             console.error(response.message);
             throw new Error(response.message);
         }
 
+        const verificationToken = await generateVerificationToken(email);
+
+        if (!verificationToken) {
+            throw new Error("Error generating verification token");
+        }
+
         // TODO: Send email verification
+        await sendVerificationTokenEmail({
+            email: verificationToken?.email,
+            token: verificationToken?.token
+        });
 
         return {
             status: response.status,
@@ -113,6 +125,13 @@ export const loginUser = defineAction({
                 path: '/auth/two-factor-authentication',
             });
 
+            const twoFactorToken = await generateTwoFactorToken({ email: user.email });
+            await sendTwoFactorTokenEmail({
+                email: twoFactorToken?.email || '',
+                token: twoFactorToken?.token || ''
+            })
+
+
             return {
                 status: 'verification',
                 message: 'Two-factor authentication is enabled for this account. Please use the verification code sent to your email.',
@@ -124,35 +143,6 @@ export const loginUser = defineAction({
             status: 'success',
             message: 'Login successful',
             data: user,
-        }
-    }
-});
-
-
-const checkTwoFactorToken = defineAction({
-    accept: 'form',
-    input: z.object({
-        email: z.string().email({ message: "Must be a valid email" }),
-    }),
-    handler: async (input, context) => {
-        const { email } = input;
-
-        const user = await getUserByEmail(email);
-
-        if (!user) {
-            throw new Error("User not found.");
-        }
-
-        if(user.isTwoFactorEnabled) {
-            throw new Error("Two-factor authentication is already enabled for this account.");
-        }
-
-        // TODO: Send verification code
-
-        return {
-            status: 'success',
-            message: 'Verification code sent successfully.',
-            data: null,
         }
     }
 });
