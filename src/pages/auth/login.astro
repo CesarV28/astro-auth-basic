@@ -84,7 +84,7 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
         password = (formData.get("password") as string) || "";
 
         try {
-            const { data, error } = await actions.loginUser.safe(formData);
+            const { data, error } = await actions.loginUser(formData);
 
             if (error) {
                 alert(error.message);
@@ -151,11 +151,12 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
         }
 
         try {
-            const { status } = await actions.verifyTwoFactorAuthentication({
+            const { data, error } = await actions.verifyTwoFactorAuthentication({
                 code: otpValues,
                 email,
             });
-            if (status === "success") {
+            
+            if (data?.status === "success") {
                 await signIn("credentials", {
                     email,
                     password,

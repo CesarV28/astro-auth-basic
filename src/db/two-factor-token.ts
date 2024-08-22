@@ -25,9 +25,9 @@ export const getTwoFactorTokenByToken = async ({ token }: { token: string }): Pr
 export const getTwoFactorTokenByEmail = async ({ email }: { email: string }): Promise<TwoFactorToken | null> => {
     try {
         const twoFactorToken = {
-            id: "",
-            email: "",
-            token: "",
+            id: "1",
+            email: "john@example.com",
+            token: "123456",
             expires: new Date()
         }
 

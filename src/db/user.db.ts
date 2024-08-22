@@ -19,8 +19,8 @@ interface ReturnMessage<T> {
 
 const mockUser: AuthUser = {
     id: "1",
-    email: "cesarvargas@gmail.com",
-    name: "Cesar Vargas",
+    email: "johndoe@example.com",
+    name: "John Doe",
     password: "123456",
     image: "",
     role: "admin",

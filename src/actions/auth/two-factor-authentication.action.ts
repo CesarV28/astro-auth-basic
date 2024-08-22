@@ -30,7 +30,7 @@ export const verifyTwoFactorAuthentication = defineAction({
         if (!twoFactorToken) {
             throw new Error("Two-factor authentication is not enabled for this account.");
         }
-
+   
         if (twoFactorToken.token !== code) {
             throw new Error("Invalid verification code.");
         }
